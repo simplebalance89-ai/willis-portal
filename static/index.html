@@ -28,6 +28,11 @@
     <button class="nav-tab" data-tab="proofread">Prof Read</button>
     <button class="nav-tab" data-tab="tasks">Task Board</button>
     <button class="nav-tab" data-tab="email">Email Peter</button>
+    <button class="nav-tab" data-tab="testsites">Test Sites</button>
+    <button class="nav-tab" data-tab="chat">Chat</button>
+    <button class="nav-tab" data-tab="filedrop">File Drop</button>
+    <button class="nav-tab" data-tab="timetrack">Time Track</button>
+    <button class="nav-tab" data-tab="pipeline">Pipeline</button>
 </nav>
 
 <!-- Main Content -->
@@ -72,6 +77,29 @@
             </ul>
         </div>
 
+        <!-- Quick Links -->
+        <div class="card">
+            <h3>Quick Links</h3>
+            <div class="dashboard-links-grid">
+                <a href="https://claude.ai/download" target="_blank" class="quick-link-card">
+                    <div class="quick-link-title">Claude Desktop</div>
+                    <div class="quick-link-desc">Download & set up Claude Desktop</div>
+                </a>
+                <a href="https://kimi.ai" target="_blank" class="quick-link-card">
+                    <div class="quick-link-title">Kimi K2.5</div>
+                    <div class="quick-link-desc">Open Kimi</div>
+                </a>
+                <a href="https://calendar.proton.me" target="_blank" class="quick-link-card">
+                    <div class="quick-link-title">Proton Calendar</div>
+                    <div class="quick-link-desc">Open Proton Calendar</div>
+                </a>
+                <a href="https://system.netsuite.com" target="_blank" class="quick-link-card">
+                    <div class="quick-link-title">NetSuite</div>
+                    <div class="quick-link-desc">Login to NetSuite</div>
+                </a>
+            </div>
+        </div>
+
         <div class="card">
             <h3>Quick Actions</h3>
             <div style="display:flex;gap:12px;flex-wrap:wrap;">
@@ -80,6 +108,8 @@
                 <button class="btn btn-outline btn-sm" onclick="switchTab('proofread')">Proofread Text</button>
                 <button class="btn btn-outline btn-sm" onclick="switchTab('tasks')">View Tasks</button>
                 <button class="btn btn-outline btn-sm" onclick="switchTab('email')">Email Peter</button>
+                <button class="btn btn-outline btn-sm" onclick="switchTab('testsites')">Test Sites</button>
+                <button class="btn btn-outline btn-sm" onclick="switchTab('pipeline')">Sales Pipeline</button>
             </div>
         </div>
     </div>
@@ -216,6 +246,93 @@
             <button class="btn btn-gold" onclick="emailPeter()">Send to Peter</button>
         </div>
     </div>
+
+    <!-- ═══ TEST SITES ═══ -->
+    <div id="section-testsites" class="section">
+        <div class="card">
+            <h3>Render Test Sites</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Health check all Render services. Click "Test Health" to ping each service.</p>
+        </div>
+        <div class="test-sites-grid" id="test-sites-grid"></div>
+    </div>
+
+    <!-- ═══ TEAM CHAT ═══ -->
+    <div id="section-chat" class="section">
+        <div class="card">
+            <h3>Team Chat</h3>
+        </div>
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div style="color:var(--muted);text-align:center;padding:40px;">No messages yet.</div>
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+                <button class="btn btn-gold btn-sm" onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ FILE DROP ═══ -->
+    <div id="section-filedrop" class="section">
+        <div class="card">
+            <h3>File Drop</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Drag & drop files or click to upload. Files are saved on the server for the team.</p>
+        </div>
+        <div class="drop-zone" id="drop-zone">
+            <div class="drop-zone-text">
+                <div style="font-size:36px;margin-bottom:8px;">+</div>
+                <div>Drag & drop files here</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;">or click to browse</div>
+            </div>
+            <input type="file" id="file-input" style="display:none;" multiple onchange="handleFileSelect(this.files)">
+        </div>
+        <div class="card" style="margin-top:16px;">
+            <h3>Uploaded Files</h3>
+            <div id="file-list"></div>
+        </div>
+    </div>
+
+    <!-- ═══ TIME TRACKING ═══ -->
+    <div id="section-timetrack" class="section">
+        <div class="card">
+            <h3>Time Tracker</h3>
+            <div class="time-tracker-controls">
+                <div class="form-group" style="flex:1;margin-bottom:0;">
+                    <label>Task</label>
+                    <select id="time-task-select"></select>
+                </div>
+                <div class="time-display" id="time-display">00:00:00</div>
+                <button class="btn btn-green btn-sm" id="time-start-btn" onclick="toggleTimer()">Start</button>
+            </div>
+        </div>
+        <div class="card" style="margin-top:16px;">
+            <h3>Time Log</h3>
+            <div id="time-log-list"></div>
+        </div>
+    </div>
+
+    <!-- ═══ SALES PIPELINE ═══ -->
+    <div id="section-pipeline" class="section">
+        <div class="card">
+            <h3>Sales Pipeline</h3>
+            <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                <div class="form-group" style="flex:1;margin-bottom:0;">
+                    <label>Company</label>
+                    <input type="text" id="lead-company" placeholder="Company name...">
+                </div>
+                <div class="form-group" style="flex:1;margin-bottom:0;">
+                    <label>Contact</label>
+                    <input type="text" id="lead-contact" placeholder="Contact name...">
+                </div>
+                <div class="form-group" style="flex:0.5;margin-bottom:0;">
+                    <label>Est. Value ($)</label>
+                    <input type="number" id="lead-value" placeholder="0" min="0">
+                </div>
+                <button class="btn btn-gold btn-sm" onclick="createLead()">Add Lead</button>
+            </div>
+        </div>
+        <div class="pipeline-board" id="pipeline-board"></div>
+    </div>
 </div>
 
 <!-- Case Detail Modal -->
@@ -224,6 +341,15 @@
         <h3 id="modal-case-title"></h3>
         <div id="modal-case-body"></div>
         <div class="modal-actions" id="modal-case-actions"></div>
+    </div>
+</div>
+
+<!-- Lead Detail Modal -->
+<div class="modal-backdrop" id="lead-modal">
+    <div class="modal">
+        <h3 id="modal-lead-title"></h3>
+        <div id="modal-lead-body"></div>
+        <div class="modal-actions" id="modal-lead-actions"></div>
     </div>
 </div>
 

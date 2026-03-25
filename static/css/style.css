@@ -170,7 +170,9 @@ a { color: var(--blue); text-decoration: none; }
 .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
 .btn-sm { padding: 6px 14px; font-size: 12px; }
 .btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: #dc2626; }
 .btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { background: #16a34a; }
 
 /* ── Dashboard ───────────────────────────────────────────────────────────── */
 
@@ -233,6 +235,42 @@ a { color: var(--blue); text-decoration: none; }
     background: rgba(255,255,255,0.03);
     border-radius: 6px;
     border-left: 3px solid var(--gold);
+}
+
+/* ── Dashboard Quick Links ───────────────────────────────────────────────── */
+
+.dashboard-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.quick-link-card {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.quick-link-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-2px);
+    background: rgba(2,150,229,0.08);
+}
+
+.quick-link-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 4px;
+}
+
+.quick-link-desc {
+    font-size: 12px;
+    color: var(--muted);
 }
 
 /* ── Case Center (Kanban) ────────────────────────────────────────────────── */
@@ -490,6 +528,295 @@ label {
     border-left: 3px solid var(--red);
 }
 
+/* ── Test Sites ──────────────────────────────────────────────────────────── */
+
+.test-sites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.test-site-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.test-site-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.test-site-url {
+    font-size: 12px;
+    color: var(--blue);
+    display: block;
+    margin-bottom: 12px;
+    word-break: break-all;
+}
+
+.test-site-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.test-site-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    min-height: 16px;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.status-unknown { background: rgba(255,255,255,0.2); }
+.status-checking { background: var(--orange); animation: pulse 1s infinite; }
+.status-healthy { background: var(--green); }
+.status-unhealthy { background: var(--red); }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* ── Team Chat ───────────────────────────────────────────────────────────── */
+
+.chat-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    height: 500px;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.chat-msg {
+    margin-bottom: 12px;
+    max-width: 80%;
+}
+
+.chat-msg-mine {
+    margin-left: auto;
+}
+
+.chat-msg-header {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 2px;
+}
+
+.chat-msg-user {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue);
+}
+
+.chat-msg-mine .chat-msg-user {
+    color: var(--gold);
+}
+
+.chat-msg-time {
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.chat-msg-text {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.chat-msg-mine .chat-msg-text {
+    background: rgba(2,150,229,0.15);
+    border-color: rgba(2,150,229,0.3);
+}
+
+.chat-input-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.chat-input-bar input {
+    flex: 1;
+    min-height: auto;
+}
+
+/* ── File Drop ───────────────────────────────────────────────────────────── */
+
+.drop-zone {
+    background: var(--card);
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+    border-color: var(--gold);
+    background: rgba(254,184,19,0.05);
+}
+
+.drop-zone-text {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.file-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.file-table th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.file-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+}
+
+.file-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+}
+
+/* ── Time Tracking ───────────────────────────────────────────────────────── */
+
+.time-tracker-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.time-display {
+    font-size: 36px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--gold);
+    min-width: 180px;
+    text-align: center;
+}
+
+/* ── Sales Pipeline ──────────────────────────────────────────────────────── */
+
+.pipeline-board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+    min-height: 400px;
+}
+
+.pipeline-column {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.pipeline-column-header {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.pipeline-column-header .count {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.pipeline-value {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.pipeline-cards {
+    min-height: 100px;
+}
+
+.pipeline-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pipeline-card:hover {
+    border-color: var(--blue);
+    transform: translateY(-1px);
+}
+
+.pipeline-card-company {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.pipeline-card-contact {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.pipeline-card-value {
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 6px;
+}
+
 /* ── Loading / Spinner ───────────────────────────────────────────────────── */
 
 .spinner {
@@ -606,5 +933,30 @@ label {
     }
     .main-content {
         padding: 16px;
+    }
+    .test-sites-grid {
+        grid-template-columns: 1fr;
+    }
+    .pipeline-board {
+        grid-template-columns: 1fr 1fr;
+    }
+    .dashboard-links-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .time-tracker-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .time-display {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .pipeline-board {
+        grid-template-columns: 1fr;
+    }
+    .dashboard-links-grid {
+        grid-template-columns: 1fr;
     }
 }

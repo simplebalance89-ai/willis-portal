@@ -8,20 +8,29 @@ import json
 import asyncio
 import smtplib
 import time
+import uuid
+import shutil
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from contextlib import asynccontextmanager
 from datetime import datetime
+from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from openai import AzureOpenAI
 
-STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-TASKS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tasks_state.json")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+TASKS_FILE = os.path.join(BASE_DIR, "tasks_state.json")
+CASES_FILE = os.path.join(BASE_DIR, "cases_state.json")
+CHAT_FILE = os.path.join(BASE_DIR, "chat_messages.json")
+TIME_FILE = os.path.join(BASE_DIR, "time_log.json")
+LEADS_FILE = os.path.join(BASE_DIR, "leads_state.json")
+DROPS_DIR = os.path.join(BASE_DIR, "drops")
 
 # Azure OpenAI config
 AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "https://pwgcerp-9302-resource.openai.azure.com/")
@@ -58,16 +67,60 @@ DEFAULT_TASKS = [
 ]
 
 
-def load_tasks():
-    if os.path.exists(TASKS_FILE):
-        with open(TASKS_FILE, "r") as f:
+# ── JSON file helpers ─────────────────────────────────────────────────────────
+
+def _load_json(path, default=None):
+    if default is None:
+        default = []
+    if os.path.exists(path):
+        with open(path, "r") as f:
             return json.load(f)
-    return DEFAULT_TASKS.copy()
+    return default
+
+
+def _save_json(path, data):
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def load_tasks():
+    return _load_json(TASKS_FILE, DEFAULT_TASKS.copy())
 
 
 def save_tasks(tasks):
-    with open(TASKS_FILE, "w") as f:
-        json.dump(tasks, f, indent=2)
+    _save_json(TASKS_FILE, tasks)
+
+
+def load_cases():
+    return _load_json(CASES_FILE, [])
+
+
+def save_cases(cases):
+    _save_json(CASES_FILE, cases)
+
+
+def load_chat():
+    return _load_json(CHAT_FILE, [])
+
+
+def save_chat(messages):
+    _save_json(CHAT_FILE, messages)
+
+
+def load_time_log():
+    return _load_json(TIME_FILE, {"active": None, "entries": []})
+
+
+def save_time_log(data):
+    _save_json(TIME_FILE, data)
+
+
+def load_leads():
+    return _load_json(LEADS_FILE, [])
+
+
+def save_leads(leads):
+    _save_json(LEADS_FILE, leads)
 
 
 # Azure client
@@ -83,11 +136,12 @@ def get_azure_client():
 async def lifespan(app: FastAPI):
     if not os.path.exists(TASKS_FILE):
         save_tasks(DEFAULT_TASKS)
+    os.makedirs(DROPS_DIR, exist_ok=True)
     print(f"Willis Portal started — {datetime.now().isoformat()}")
     yield
 
 
-app = FastAPI(title="Willis Portal", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="Willis Portal", version="2.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -130,17 +184,23 @@ class CaseCreate(BaseModel):
     priority: str = "medium"
     category: str = "general"
 
-CASES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cases_state.json")
+class ChatMessage(BaseModel):
+    username: str
+    message: str
 
-def load_cases():
-    if os.path.exists(CASES_FILE):
-        with open(CASES_FILE, "r") as f:
-            return json.load(f)
-    return []
+class LeadCreate(BaseModel):
+    company: str
+    contact: str
+    notes: str = ""
+    value: float = 0.0
+    stage: str = "prospect"
 
-def save_cases(cases):
-    with open(CASES_FILE, "w") as f:
-        json.dump(cases, f, indent=2)
+class LeadUpdate(BaseModel):
+    company: Optional[str] = None
+    contact: Optional[str] = None
+    notes: Optional[str] = None
+    value: Optional[float] = None
+    stage: Optional[str] = None
 
 
 # ── Routes ───────────────────────────────────────────────────────────────────
@@ -151,6 +211,7 @@ async def root():
 
 
 @app.get("/api/health")
+@app.get("/health")
 async def health():
     return {
         "status": "healthy",
@@ -386,6 +447,169 @@ async def email_peter(req: EmailRequest):
         return {"status": "sent", "to": PETER_EMAIL}
     except Exception as e:
         raise HTTPException(500, f"Email failed: {str(e)}")
+
+
+# ── Team Chat ────────────────────────────────────────────────────────────────
+
+@app.get("/api/chat/messages")
+async def get_chat_messages():
+    return {"messages": load_chat()}
+
+
+@app.post("/api/chat/send")
+async def send_chat_message(msg: ChatMessage):
+    messages = load_chat()
+    new_msg = {
+        "id": str(uuid.uuid4())[:8],
+        "username": msg.username,
+        "message": msg.message,
+        "timestamp": datetime.now().isoformat(),
+    }
+    messages.append(new_msg)
+    # Keep last 200 messages
+    if len(messages) > 200:
+        messages = messages[-200:]
+    save_chat(messages)
+    return new_msg
+
+
+# ── File Drop ────────────────────────────────────────────────────────────────
+
+@app.get("/api/files/list")
+async def list_files():
+    os.makedirs(DROPS_DIR, exist_ok=True)
+    files = []
+    for fname in os.listdir(DROPS_DIR):
+        fpath = os.path.join(DROPS_DIR, fname)
+        if os.path.isfile(fpath):
+            stat = os.stat(fpath)
+            files.append({
+                "name": fname,
+                "size": stat.st_size,
+                "uploaded": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+            })
+    files.sort(key=lambda x: x["uploaded"], reverse=True)
+    return {"files": files}
+
+
+@app.post("/api/files/upload")
+async def upload_file(file: UploadFile = File(...)):
+    os.makedirs(DROPS_DIR, exist_ok=True)
+    # Avoid overwriting: prepend timestamp if file exists
+    safe_name = file.filename.replace("/", "_").replace("\\", "_")
+    dest = os.path.join(DROPS_DIR, safe_name)
+    if os.path.exists(dest):
+        base, ext = os.path.splitext(safe_name)
+        safe_name = f"{base}_{int(time.time())}{ext}"
+        dest = os.path.join(DROPS_DIR, safe_name)
+
+    with open(dest, "wb") as f:
+        content = await file.read()
+        f.write(content)
+
+    return {
+        "name": safe_name,
+        "size": len(content),
+        "uploaded": datetime.now().isoformat(),
+    }
+
+
+@app.get("/api/files/download/{filename}")
+async def download_file(filename: str):
+    fpath = os.path.join(DROPS_DIR, filename)
+    if not os.path.exists(fpath):
+        raise HTTPException(404, "File not found")
+    return FileResponse(fpath, filename=filename)
+
+
+# ── Time Tracking ────────────────────────────────────────────────────────────
+
+@app.get("/api/time/log")
+async def get_time_log():
+    return load_time_log()
+
+
+@app.post("/api/time/start")
+async def start_timer(task_id: int = Query(...), task_title: str = Query("")):
+    data = load_time_log()
+    if data.get("active"):
+        raise HTTPException(400, "Timer already running. Stop it first.")
+    data["active"] = {
+        "task_id": task_id,
+        "task_title": task_title,
+        "started": datetime.now().isoformat(),
+    }
+    save_time_log(data)
+    return data["active"]
+
+
+@app.post("/api/time/stop")
+async def stop_timer():
+    data = load_time_log()
+    if not data.get("active"):
+        raise HTTPException(400, "No timer running.")
+    active = data["active"]
+    started = datetime.fromisoformat(active["started"])
+    ended = datetime.now()
+    duration_seconds = int((ended - started).total_seconds())
+    entry = {
+        "id": str(uuid.uuid4())[:8],
+        "task_id": active["task_id"],
+        "task_title": active["task_title"],
+        "started": active["started"],
+        "ended": ended.isoformat(),
+        "duration_seconds": duration_seconds,
+    }
+    data["entries"].append(entry)
+    data["active"] = None
+    save_time_log(data)
+    return entry
+
+
+# ── Sales Pipeline (Leads) ───────────────────────────────────────────────────
+
+@app.get("/api/leads")
+async def get_leads():
+    return {"leads": load_leads()}
+
+
+@app.post("/api/leads")
+async def create_lead(lead: LeadCreate):
+    leads = load_leads()
+    new_lead = {
+        "id": str(uuid.uuid4())[:8],
+        "company": lead.company,
+        "contact": lead.contact,
+        "notes": lead.notes,
+        "value": lead.value,
+        "stage": lead.stage,
+        "created": datetime.now().isoformat(),
+        "updated": datetime.now().isoformat(),
+    }
+    leads.append(new_lead)
+    save_leads(leads)
+    return new_lead
+
+
+@app.put("/api/leads/{lead_id}")
+async def update_lead(lead_id: str, update: LeadUpdate):
+    leads = load_leads()
+    for lead in leads:
+        if lead["id"] == lead_id:
+            if update.company is not None:
+                lead["company"] = update.company
+            if update.contact is not None:
+                lead["contact"] = update.contact
+            if update.notes is not None:
+                lead["notes"] = update.notes
+            if update.value is not None:
+                lead["value"] = update.value
+            if update.stage is not None:
+                lead["stage"] = update.stage
+            lead["updated"] = datetime.now().isoformat()
+            save_leads(leads)
+            return lead
+    raise HTTPException(404, "Lead not found")
 
 
 # Static files (mount last)
