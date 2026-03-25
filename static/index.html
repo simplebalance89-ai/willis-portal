@@ -29,7 +29,7 @@
     <button class="nav-tab" data-tab="tasks">Task Board</button>
     <button class="nav-tab" data-tab="email">Email Peter</button>
     <button class="nav-tab" data-tab="testsites">Test Sites</button>
-    <button class="nav-tab" data-tab="chat">Chat</button>
+    <button class="nav-tab" data-tab="signal">Signal</button>
     <button class="nav-tab" data-tab="filedrop">File Drop</button>
     <button class="nav-tab" data-tab="timetrack">Time Track</button>
     <button class="nav-tab" data-tab="pipeline">Pipeline</button>
@@ -96,6 +96,10 @@
                 <a href="https://system.netsuite.com" target="_blank" class="quick-link-card">
                     <div class="quick-link-title">NetSuite</div>
                     <div class="quick-link-desc">Login to NetSuite</div>
+                </a>
+                <a href="https://signal.org/download/" target="_blank" class="quick-link-card">
+                    <div class="quick-link-title">Signal</div>
+                    <div class="quick-link-desc">Secure team messaging</div>
                 </a>
             </div>
         </div>
@@ -256,19 +260,66 @@
         <div class="test-sites-grid" id="test-sites-grid"></div>
     </div>
 
-    <!-- ═══ TEAM CHAT ═══ -->
-    <div id="section-chat" class="section">
+    <!-- ═══ SIGNAL MESSAGING ═══ -->
+    <div id="section-signal" class="section">
         <div class="card">
-            <h3>Team Chat</h3>
+            <h3>Signal — Secure Messaging</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Private, encrypted messaging for team communication. Signal is the primary channel for quick messages, updates, and coordination with Peter.</p>
         </div>
-        <div class="chat-container">
-            <div class="chat-messages" id="chat-messages">
-                <div style="color:var(--muted);text-align:center;padding:40px;">No messages yet.</div>
-            </div>
-            <div class="chat-input-bar">
-                <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChatMessage()">
-                <button class="btn btn-gold btn-sm" onclick="sendChatMessage()">Send</button>
-            </div>
+
+        <div class="signal-grid">
+            <a href="https://signal.org/download/" target="_blank" class="signal-card signal-card-primary">
+                <div class="signal-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/>
+                        <circle cx="8" cy="10" r="1" fill="currentColor" stroke="none"/>
+                        <circle cx="16" cy="10" r="1" fill="currentColor" stroke="none"/>
+                    </svg>
+                </div>
+                <div class="signal-card-title">Download Signal Desktop</div>
+                <div class="signal-card-desc">Get the desktop app for Windows, Mac, or Linux. Sync with your phone for full access.</div>
+                <div class="signal-card-action">signal.org/download</div>
+            </a>
+
+            <a href="https://signal.me/" target="_blank" class="signal-card">
+                <div class="signal-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M19 8v6"/>
+                        <path d="M22 11h-6"/>
+                    </svg>
+                </div>
+                <div class="signal-card-title">Signal.me — Connect</div>
+                <div class="signal-card-desc">Share your Signal contact link or find someone by their Signal username.</div>
+                <div class="signal-card-action">signal.me</div>
+            </a>
+
+            <a href="https://support.signal.org/hc/en-us/articles/360007059752-Signal-Desktop" target="_blank" class="signal-card">
+                <div class="signal-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>
+                <div class="signal-card-title">Setup Guide</div>
+                <div class="signal-card-desc">Step-by-step instructions for linking Signal Desktop to your phone.</div>
+                <div class="signal-card-action">Signal Support</div>
+            </a>
+        </div>
+
+        <div class="card" style="margin-top:16px;">
+            <h3>Why Signal?</h3>
+            <ul style="list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <li style="font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid var(--green);">End-to-end encrypted</li>
+                <li style="font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid var(--green);">No ads, no tracking</li>
+                <li style="font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid var(--green);">Desktop + mobile sync</li>
+                <li style="font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid var(--green);">Disappearing messages</li>
+                <li style="font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid var(--green);">Group chats + file sharing</li>
+                <li style="font-size:13px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;border-left:3px solid var(--green);">Open source & audited</li>
+            </ul>
         </div>
     </div>
 

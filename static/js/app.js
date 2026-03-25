@@ -46,7 +46,7 @@ function switchTab(tabName) {
     document.getElementById(`section-${tabName}`).classList.add('active');
 
     // Auto-refresh on tab switch
-    if (tabName === 'chat') loadChatMessages();
+    // Signal tab is static — no data to load
     if (tabName === 'filedrop') loadFiles();
     if (tabName === 'timetrack') loadTimeLog();
     if (tabName === 'pipeline') loadLeads();
