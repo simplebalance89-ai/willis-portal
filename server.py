@@ -16,12 +16,15 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Optional
 
+import httpx
 from fastapi import FastAPI, HTTPException, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from openai import AzureOpenAI
+
+from agent import chat as agent_chat
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -610,6 +613,67 @@ async def update_lead(lead_id: str, update: LeadUpdate):
             save_leads(leads)
             return lead
     raise HTTPException(404, "Lead not found")
+
+
+# ── Scout Agent ──────────────────────────────────────────────────────────────
+
+WHISPER_ENDPOINT = os.getenv("AZURE_WHISPER_ENDPOINT", "https://enpro-whisper.openai.azure.com/")
+WHISPER_KEY = os.getenv("AZURE_WHISPER_KEY", "")
+WHISPER_DEPLOYMENT = os.getenv("AZURE_WHISPER_DEPLOYMENT", "whisper")
+WHISPER_API_VERSION = os.getenv("AZURE_WHISPER_API_VERSION", "2024-12-01-preview")
+
+
+class AgentChatRequest(BaseModel):
+    message: str
+    session_id: str = "default"
+
+
+@app.post("/agent/chat")
+async def agent_chat_endpoint(req: AgentChatRequest):
+    """Scout agent chat — Willis talks, Scout handles everything."""
+    portal_data = {
+        "tasks": load_tasks(),
+        "cases": load_cases(),
+        "leads": load_leads(),
+        "time_log": load_time_log(),
+    }
+    result = await agent_chat(req.message, req.session_id, portal_data)
+    return result
+
+
+@app.post("/agent/stt")
+async def agent_stt(file: UploadFile = File(...)):
+    """Speech-to-text for Scout agent via Azure Whisper."""
+    whisper_key = WHISPER_KEY or AZURE_KEY
+    if not whisper_key:
+        return {"error": "Whisper not configured", "text": ""}
+
+    audio_bytes = await file.read()
+    if not audio_bytes:
+        return {"error": "Empty audio", "text": ""}
+
+    whisper_base = WHISPER_ENDPOINT or AZURE_ENDPOINT
+    url = (
+        f"{whisper_base.rstrip('/')}/openai/deployments/"
+        f"{WHISPER_DEPLOYMENT}/audio/transcriptions"
+        f"?api-version={WHISPER_API_VERSION}"
+    )
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            resp = await client.post(
+                url,
+                headers={"api-key": whisper_key},
+                files={
+                    "file": (file.filename or "audio.webm", audio_bytes, file.content_type or "audio/webm"),
+                    "response_format": (None, "json"),
+                },
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            return {"text": data.get("text", "").strip()}
+    except Exception as e:
+        return {"error": str(e), "text": ""}
 
 
 # Static files (mount last)

@@ -915,3 +915,134 @@ function showLoading(msg = 'Loading...') {
 function hideLoading() {
     document.getElementById('loading').classList.remove('active');
 }
+
+
+// ── Scout Agent Chat ────────────────────────────────────────────────────────
+
+let agentSessionId = localStorage.getItem('scout-session') || ('s_' + Date.now());
+localStorage.setItem('scout-session', agentSessionId);
+let agentOpen = false;
+let agentRecorder = null;
+let agentRecording = false;
+let agentChunks = [];
+
+function toggleAgentChat() {
+    const panel = document.getElementById('agent-panel');
+    const bubble = document.getElementById('agent-bubble');
+    agentOpen = !agentOpen;
+    if (agentOpen) {
+        panel.classList.add('open');
+        bubble.style.display = 'none';
+        if (document.getElementById('agent-messages').children.length === 0) {
+            addAgentMsg('assistant', 'Hey Willis. I\'m Scout, your ops assistant. What do you want to tackle?');
+        }
+        document.getElementById('agent-input').focus();
+    } else {
+        panel.classList.remove('open');
+        bubble.style.display = 'flex';
+    }
+}
+
+function addAgentMsg(role, html, extra) {
+    const container = document.getElementById('agent-messages');
+    const div = document.createElement('div');
+    div.className = 'agent-msg ' + role;
+    div.innerHTML = html;
+    if (extra && extra.action === 'confirm_needed') {
+        div.innerHTML += '<div class="agent-confirm-row">' +
+            '<button class="agent-confirm-yes" onclick="agentConfirm(true)">Yes, do it</button>' +
+            '<button class="agent-confirm-no" onclick="agentConfirm(false)">No, cancel</button></div>';
+    }
+    if (extra && extra.action === 'switch_tab' && extra.tab) {
+        div.innerHTML += '<br><button class="agent-quick-btn" onclick="switchTab(\'' + extra.tab + '\');toggleAgentChat()">Open ' + extra.tab + '</button>';
+    }
+    if (extra && extra.action === 'open_crowdsource') {
+        div.innerHTML += '<br><button class="agent-quick-btn" onclick="switchTab(\'crowdsource\');toggleAgentChat()">Open Crowdsource</button>';
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function agentSend(message) {
+    if (!message || !message.trim()) return;
+    addAgentMsg('user', escapeHtml(message));
+    const typing = document.createElement('div');
+    typing.className = 'agent-msg assistant';
+    typing.id = 'agent-typing';
+    typing.innerHTML = '<em style="color:var(--muted);">Scout is thinking...</em>';
+    document.getElementById('agent-messages').appendChild(typing);
+    document.getElementById('agent-messages').scrollTop = 999999;
+
+    try {
+        const res = await fetch(API + '/agent/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message, session_id: agentSessionId }),
+        });
+        const data = await res.json();
+        const t = document.getElementById('agent-typing');
+        if (t) t.remove();
+        const reply = data.reply || 'Had a hiccup. Try again?';
+        addAgentMsg('assistant', reply.replace(/\n/g, '<br>'), data);
+    } catch (err) {
+        const t = document.getElementById('agent-typing');
+        if (t) t.remove();
+        addAgentMsg('assistant', 'Connection issue. Try again in a sec.');
+    }
+}
+
+function agentSendFromInput() {
+    const input = document.getElementById('agent-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    agentSend(msg);
+}
+
+function agentConfirm(yes) {
+    agentSend(yes ? 'Yes, go ahead' : 'No, cancel that');
+}
+
+async function agentVoiceInput() {
+    const micBtn = document.getElementById('agent-mic-btn');
+    if (agentRecording) {
+        agentRecording = false;
+        micBtn.classList.remove('listening');
+        if (agentRecorder && agentRecorder.state === 'recording') agentRecorder.stop();
+        return;
+    }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { noiseSuppression: true, echoCancellation: true, autoGainControl: true, channelCount: 1 }
+        });
+        agentChunks = [];
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+        agentRecorder = new MediaRecorder(stream, { mimeType });
+        agentRecorder.ondataavailable = function(e) { if (e.data.size > 0) agentChunks.push(e.data); };
+        agentRecorder.onstop = async function() {
+            stream.getTracks().forEach(function(t) { t.stop(); });
+            if (agentChunks.length === 0) return;
+            const blob = new Blob(agentChunks, { type: agentRecorder.mimeType });
+            agentChunks = [];
+            document.getElementById('agent-input').placeholder = 'Processing voice...';
+            try {
+                const fd = new FormData();
+                fd.append('file', blob, 'recording.webm');
+                const resp = await fetch(API + '/agent/stt', { method: 'POST', body: fd });
+                const data = await resp.json();
+                const transcript = (data.text || '').trim();
+                document.getElementById('agent-input').placeholder = 'Ask Scout anything...';
+                if (transcript) { document.getElementById('agent-input').value = transcript; agentSendFromInput(); }
+                else { addAgentMsg('assistant', 'Didn\'t catch that. Try again or type it.'); }
+            } catch (err) {
+                document.getElementById('agent-input').placeholder = 'Ask Scout anything...';
+                addAgentMsg('assistant', 'Voice didn\'t work. Try typing.');
+            }
+        };
+        agentRecorder.start();
+        agentRecording = true;
+        micBtn.classList.add('listening');
+    } catch (err) {
+        addAgentMsg('assistant', 'Need mic access. Allow it in browser settings.');
+    }
+}

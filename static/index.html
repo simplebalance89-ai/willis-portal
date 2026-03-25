@@ -410,6 +410,32 @@
     <div class="loading-text" style="color:var(--gold);font-size:14px;">Loading...</div>
 </div>
 
+<!-- Scout Agent Chat Bubble -->
+<div id="agent-bubble" onclick="toggleAgentChat()" title="Talk to Scout">
+    <span style="font-size:26px;">&#128373;</span>
+</div>
+
+<div id="agent-panel">
+    <div id="agent-header">
+        <span style="font-size:20px;">&#128373;</span>
+        <span style="font-weight:700;">Scout</span>
+        <span style="flex:1;"></span>
+        <button onclick="toggleAgentChat()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">&times;</button>
+    </div>
+    <div id="agent-messages"></div>
+    <div id="agent-quick-actions">
+        <button class="agent-quick-btn" onclick="agentSend('Run health checks')">&#9889; Health Check</button>
+        <button class="agent-quick-btn" onclick="agentSend('Show my tasks')">&#9776; Tasks</button>
+        <button class="agent-quick-btn" onclick="agentSend('Pipeline status')">&#128200; Pipeline</button>
+        <button class="agent-quick-btn" onclick="agentSend('Draft weekly report')">&#128196; Report</button>
+    </div>
+    <div id="agent-input-row">
+        <button id="agent-mic-btn" onclick="agentVoiceInput()" title="Voice input">&#127908;</button>
+        <input type="text" id="agent-input" placeholder="Ask Scout anything..." onkeypress="if(event.key==='Enter')agentSendFromInput()">
+        <button id="agent-send-btn" onclick="agentSendFromInput()">&#10148;</button>
+    </div>
+</div>
+
 <script src="/static/js/app.js"></script>
 <script>
     // Update header clock
