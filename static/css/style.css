@@ -1,21 +1,21 @@
 /* Willis Portal — Operations Scout Hub */
 
 :root {
-    --navy: #0A0B43;
-    --blue: #0296E5;
-    --gold: #FEB813;
-    --dark: #060620;
-    --surface: #0F0F30;
-    --card: #161648;
-    --border: rgba(255,255,255,0.08);
-    --text: rgba(255,255,255,0.85);
+    --navy: #0a2e1f;
+    --blue: #00b4d8;
+    --gold: #f4a261;
+    --dark: #061a12;
+    --surface: #0f3326;
+    --card: #163d2e;
+    --border: rgba(255,255,255,0.10);
+    --text: rgba(255,255,255,0.88);
     --muted: rgba(255,255,255,0.5);
-    --gold-hover: #e5a611;
-    --blue-hover: #0280c9;
-    --green: #22c55e;
+    --gold-hover: #e08c4a;
+    --blue-hover: #0096b7;
+    --green: #2dd4bf;
     --orange: #f59e0b;
     --red: #ef4444;
-    --purple: #a855f7;
+    --purple: #c084fc;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
