@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: willis-portal
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: AZURE_OPENAI_ENDPOINT
+        sync: false
+      - key: AZURE_OPENAI_KEY
+        sync: false
+      - key: AZURE_API_VERSION
+        value: "2024-12-01-preview"
+      - key: SMTP_HOST
+        value: "127.0.0.1"
+      - key: SMTP_PORT
+        value: "1026"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: PETER_EMAIL
+        value: "dkgianelli@proton.me"

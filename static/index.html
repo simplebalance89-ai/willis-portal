@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Willis Portal — Operations Scout Hub</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+    <div style="display:flex;align-items:center;">
+        <h1>WILLIS</h1>
+        <span class="subtitle">Operations Scout Hub</span>
+    </div>
+    <div class="header-status">
+        <span class="status-dot"></span>
+        <span id="header-time"></span>
+    </div>
+</header>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+    <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
+    <button class="nav-tab" data-tab="cases">Case Center</button>
+    <button class="nav-tab" data-tab="crowdsource">Crowdsource</button>
+    <button class="nav-tab" data-tab="proofread">Prof Read</button>
+    <button class="nav-tab" data-tab="tasks">Task Board</button>
+    <button class="nav-tab" data-tab="email">Email Peter</button>
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="section-dashboard" class="section active">
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-tasks-done">0/10</div>
+                <div class="stat-label">Tasks Complete</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-tasks-active">0</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-cases-open">0</div>
+                <div class="stat-label">Open Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-date">—</div>
+                <div class="stat-label">Today</div>
+            </div>
+        </div>
+
+        <div class="card role-card">
+            <h2>Operations Scout & QA Analyst</h2>
+            <p>You are the operations and quality layer for an AI-driven consulting and product practice. You make sure everything works before it ships, research what's needed to stay ahead, and keep the products and deliverables at a standard clients trust.</p>
+            <ul class="ownership-list">
+                <li>Client Deliverable QA</li>
+                <li>Daily Product Health Checks</li>
+                <li>Bug Tracking & Documentation</li>
+                <li>AI Model Benchmarking</li>
+                <li>Prompt Library Maintenance</li>
+                <li>Prospect & Client Research</li>
+                <li>Competitive Intelligence</li>
+                <li>Data Source Validation</li>
+                <li>Weekly Operations Report</li>
+                <li>Testing Playbooks & SOPs</li>
+                <li>Sales Pipeline Development</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>Quick Actions</h3>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-gold btn-sm" onclick="switchTab('cases')">Open Case Center</button>
+                <button class="btn btn-blue btn-sm" onclick="switchTab('crowdsource')">Crowdsource Analysis</button>
+                <button class="btn btn-outline btn-sm" onclick="switchTab('proofread')">Proofread Text</button>
+                <button class="btn btn-outline btn-sm" onclick="switchTab('tasks')">View Tasks</button>
+                <button class="btn btn-outline btn-sm" onclick="switchTab('email')">Email Peter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CASE CENTER ═══ -->
+    <div id="section-cases" class="section">
+        <div class="card case-form">
+            <h3>Create Case</h3>
+            <div class="form-row">
+                <div style="flex:2;">
+                    <input type="text" id="case-title" placeholder="Case title...">
+                </div>
+                <div style="flex:1;">
+                    <select id="case-priority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div style="flex:1;">
+                    <select id="case-category">
+                        <option value="bug">Bug</option>
+                        <option value="qa">QA Finding</option>
+                        <option value="research">Research</option>
+                        <option value="request">Request</option>
+                        <option value="general" selected>General</option>
+                    </select>
+                </div>
+            </div>
+            <textarea id="case-desc" rows="3" placeholder="Describe the case..."></textarea>
+            <div style="margin-top:12px;">
+                <button class="btn btn-gold btn-sm" onclick="createCase()">Create Case</button>
+            </div>
+        </div>
+
+        <div class="kanban-board">
+            <div class="kanban-column">
+                <h4>New <span class="count">0</span></h4>
+                <div id="cases-new"></div>
+            </div>
+            <div class="kanban-column">
+                <h4>In Progress <span class="count">0</span></h4>
+                <div id="cases-in_progress"></div>
+            </div>
+            <div class="kanban-column">
+                <h4>Waiting <span class="count">0</span></h4>
+                <div id="cases-waiting"></div>
+            </div>
+            <div class="kanban-column">
+                <h4>Closed <span class="count">0</span></h4>
+                <div id="cases-closed"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CROWDSOURCE ═══ -->
+    <div id="section-crowdsource" class="section">
+        <div class="card">
+            <h3>Crowdsource Portal</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Send your prompt to GPT-4.1, GPT-4.1 Mini, Grok 4.1, and DeepSeek V3.2 simultaneously. Compare results side by side.</p>
+
+            <div class="form-group">
+                <label>System Prompt (optional)</label>
+                <input type="text" id="crowd-system" placeholder="You are a helpful AI assistant..." value="You are a helpful AI assistant. Be concise and accurate.">
+            </div>
+
+            <div class="form-group">
+                <label>Your Prompt</label>
+                <textarea id="crowd-prompt" rows="5" placeholder="Enter your prompt here..."></textarea>
+            </div>
+
+            <button class="btn btn-gold" onclick="runCrowdsource()">Crowdsource It</button>
+        </div>
+
+        <div id="crowd-results" class="crowdsource-results"></div>
+    </div>
+
+    <!-- ═══ PROF READ ═══ -->
+    <div id="section-proofread" class="section">
+        <div class="card">
+            <h3>Prof Read — AI Proofreader</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Paste your text and get grammar, clarity, tone, and structural feedback powered by GPT-4.1.</p>
+        </div>
+
+        <div class="proofread-layout">
+            <div>
+                <div class="form-group">
+                    <label>Style</label>
+                    <select id="proof-style">
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="academic">Academic</option>
+                        <option value="technical">Technical</option>
+                        <option value="email">Email</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Your Text</label>
+                    <textarea id="proof-input" rows="15" placeholder="Paste your text here..."></textarea>
+                </div>
+                <button class="btn btn-gold" onclick="runProofread()">Proofread</button>
+            </div>
+            <div class="proofread-result" id="proof-result">
+                <div style="color:var(--muted);text-align:center;padding:40px;">
+                    Results will appear here...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TASK BOARD ═══ -->
+    <div id="section-tasks" class="section">
+        <div class="card">
+            <h3>Task Board — March 2026</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:4px;">Prioritized 1-10. Update status as you work through each task.</p>
+        </div>
+        <ul id="task-list" class="task-list"></ul>
+    </div>
+
+    <!-- ═══ EMAIL PETER ═══ -->
+    <div id="section-email" class="section">
+        <div class="card">
+            <h3>Email Peter</h3>
+            <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Send a message directly to Peter via Proton Mail. Use for questions, flags, updates, or daily drops.</p>
+
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" id="email-subject" placeholder="Subject line...">
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea id="email-body" rows="10" placeholder="Write your message..."></textarea>
+            </div>
+            <button class="btn btn-gold" onclick="emailPeter()">Send to Peter</button>
+        </div>
+    </div>
+</div>
+
+<!-- Case Detail Modal -->
+<div class="modal-backdrop" id="case-modal">
+    <div class="modal">
+        <h3 id="modal-case-title"></h3>
+        <div id="modal-case-body"></div>
+        <div class="modal-actions" id="modal-case-actions"></div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text" style="color:var(--gold);font-size:14px;">Loading...</div>
+</div>
+
+<script src="/static/js/app.js"></script>
+<script>
+    // Update header clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('header-time').textContent = now.toLocaleString('en-US', {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+    }
+    updateClock();
+    setInterval(updateClock, 60000);
+</script>
+</body>
+</html>
