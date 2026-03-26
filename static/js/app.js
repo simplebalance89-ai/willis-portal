@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // ── Navigation ──────────────────────────────────────────────────────────────
 function setupNavigation() {
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            const target = tab.dataset.tab;
+    document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.tab;
             switchTab(target);
         });
     });
@@ -40,10 +40,12 @@ function setupNavigation() {
 
 function switchTab(tabName) {
     activeTab = tabName;
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.bottom-nav-btn').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-    document.getElementById(`section-${tabName}`).classList.add('active');
+    const btn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (btn) btn.classList.add('active');
+    const section = document.getElementById(`section-${tabName}`);
+    if (section) section.classList.add('active');
 
     // Auto-refresh on tab switch
     // Signal tab is static — no data to load

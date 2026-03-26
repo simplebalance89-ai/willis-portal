@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Willis Portal — Neighborhood Grill & Operations Hub</title>
+    <title>Willis Portal — Operations Hub</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -20,25 +20,36 @@
     </div>
 </header>
 
-<!-- Navigation -->
-<nav class="nav-bar">
-    <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
-    <button class="nav-tab" data-tab="cases">Case Center</button>
-    <button class="nav-tab" data-tab="crowdsource">Crowdsource</button>
-    <button class="nav-tab" data-tab="proofread">Prof Read</button>
-    <button class="nav-tab" data-tab="tasks">Task Board</button>
-    <button class="nav-tab" data-tab="email">Email Peter</button>
-    <button class="nav-tab" data-tab="testsites">Test Sites</button>
-    <button class="nav-tab" data-tab="signal">Signal</button>
-    <button class="nav-tab" data-tab="filedrop">File Drop</button>
-    <button class="nav-tab" data-tab="timetrack">Time Track</button>
-    <button class="nav-tab" data-tab="pipeline">Pipeline</button>
+<!-- Hawaii Stripe -->
+<div class="hawaii-stripe">
+    <div class="stripe-ocean"></div>
+    <div class="stripe-sand"></div>
+    <div class="stripe-sunset"></div>
+</div>
+
+<!-- Top Bar — Tools -->
+<nav class="top-nav" id="top-nav">
+    <button class="bottom-nav-btn" data-tab="crowdsource"><span class="nav-icon">&#129504;</span><span class="nav-label">Crowdsource</span></button>
+    <button class="bottom-nav-btn" data-tab="proofread"><span class="nav-icon">&#128221;</span><span class="nav-label">Prof Read</span></button>
+    <button class="bottom-nav-btn" data-tab="email"><span class="nav-icon">&#9993;</span><span class="nav-label">Email</span></button>
+    <button class="bottom-nav-btn" data-tab="signal"><span class="nav-icon">&#128172;</span><span class="nav-label">Signal</span></button>
+    <button class="bottom-nav-btn" data-tab="testsites"><span class="nav-icon">&#128161;</span><span class="nav-label">Test Sites</span></button>
+    <button class="bottom-nav-btn" data-tab="pipeline"><span class="nav-icon">&#128200;</span><span class="nav-label">Pipeline</span></button>
+</nav>
+
+<!-- Bottom Bar — Core -->
+<nav class="bottom-nav" id="bottom-nav">
+    <button class="bottom-nav-btn active" data-tab="dashboard"><span class="nav-icon">&#127968;</span><span class="nav-label">Home</span></button>
+    <button class="bottom-nav-btn" data-tab="cases"><span class="nav-icon">&#128218;</span><span class="nav-label">Cases</span></button>
+    <button class="bottom-nav-btn" data-tab="tasks"><span class="nav-icon">&#9745;</span><span class="nav-label">Tasks</span></button>
+    <button class="bottom-nav-btn" data-tab="timetrack"><span class="nav-icon">&#9201;</span><span class="nav-label">Time</span></button>
+    <button class="bottom-nav-btn" data-tab="filedrop"><span class="nav-icon">&#128193;</span><span class="nav-label">Files</span></button>
 </nav>
 
 <!-- Main Content -->
 <div class="main-content">
 
-    <!-- ═══ DASHBOARD ═══ -->
+    <!-- DASHBOARD -->
     <div id="section-dashboard" class="section active">
         <div class="dashboard-grid">
             <div class="stat-card">
@@ -118,7 +129,7 @@
         </div>
     </div>
 
-    <!-- ═══ CASE CENTER ═══ -->
+    <!-- CASE CENTER -->
     <div id="section-cases" class="section">
         <div class="card case-form">
             <h3>Create Case</h3>
@@ -169,7 +180,7 @@
         </div>
     </div>
 
-    <!-- ═══ CROWDSOURCE ═══ -->
+    <!-- CROWDSOURCE -->
     <div id="section-crowdsource" class="section">
         <div class="card">
             <h3>Crowdsource Portal</h3>
@@ -191,7 +202,7 @@
         <div id="crowd-results" class="crowdsource-results"></div>
     </div>
 
-    <!-- ═══ PROF READ ═══ -->
+    <!-- PROF READ -->
     <div id="section-proofread" class="section">
         <div class="card">
             <h3>Prof Read — AI Proofreader</h3>
@@ -224,7 +235,7 @@
         </div>
     </div>
 
-    <!-- ═══ TASK BOARD ═══ -->
+    <!-- TASK BOARD -->
     <div id="section-tasks" class="section">
         <div class="card">
             <h3>Task Board — March 2026</h3>
@@ -233,7 +244,7 @@
         <ul id="task-list" class="task-list"></ul>
     </div>
 
-    <!-- ═══ EMAIL PETER ═══ -->
+    <!-- EMAIL PETER -->
     <div id="section-email" class="section">
         <div class="card">
             <h3>Email Peter</h3>
@@ -251,7 +262,7 @@
         </div>
     </div>
 
-    <!-- ═══ TEST SITES ═══ -->
+    <!-- TEST SITES -->
     <div id="section-testsites" class="section">
         <div class="card">
             <h3>Render Test Sites</h3>
@@ -260,7 +271,7 @@
         <div class="test-sites-grid" id="test-sites-grid"></div>
     </div>
 
-    <!-- ═══ SIGNAL MESSAGING ═══ -->
+    <!-- SIGNAL -->
     <div id="section-signal" class="section">
         <div class="card">
             <h3>Signal — Secure Messaging</h3>
@@ -323,7 +334,7 @@
         </div>
     </div>
 
-    <!-- ═══ FILE DROP ═══ -->
+    <!-- FILE DROP -->
     <div id="section-filedrop" class="section">
         <div class="card">
             <h3>File Drop</h3>
@@ -343,7 +354,7 @@
         </div>
     </div>
 
-    <!-- ═══ TIME TRACKING ═══ -->
+    <!-- TIME TRACKING -->
     <div id="section-timetrack" class="section">
         <div class="card">
             <h3>Time Tracker</h3>
@@ -362,7 +373,7 @@
         </div>
     </div>
 
-    <!-- ═══ SALES PIPELINE ═══ -->
+    <!-- SALES PIPELINE -->
     <div id="section-pipeline" class="section">
         <div class="card">
             <h3>Sales Pipeline</h3>
