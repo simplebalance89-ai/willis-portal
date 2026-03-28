@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Willis HQ — Start Here</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1A3D2E;
+    --green-mid: #2E5F4A;
+    --green-accent: #4A9B72;
+    --green-light: #A8D5BE;
+    --amber: #E8A020;
+    --amber-light: #FFF0CC;
+    --red: #C0392B;
+    --bg: #0D1F17;
+    --surface: #142B1F;
+    --surface2: #1C3828;
+    --border: #2A5040;
+    --text: #E8F5EE;
+    --text-muted: #7AB090;
+    --mono: 'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 56px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--green-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--green-accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .logo-text {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+
+  .header-date {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 56px;
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--green-accent);
+    text-transform: uppercase;
+    background: rgba(74, 155, 114, 0.12);
+    border: 1px solid rgba(74, 155, 114, 0.3);
+    padding: 4px 10px;
+    border-radius: 3px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 58px);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  h1 span { color: var(--green-accent); }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  /* MISSION BOX */
+  .mission {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green-accent);
+    padding: 24px 28px;
+    border-radius: 8px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .mission-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--green-accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .mission p {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .mission strong { color: var(--amber); }
+
+  /* TODAY'S TASK */
+  .today {
+    background: linear-gradient(135deg, #1C3828 0%, #1A3D2E 100%);
+    border: 1px solid var(--green-mid);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .today::before {
+    content: 'TODAY';
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    font-family: var(--display);
+    font-size: 72px;
+    font-weight: 800;
+    color: rgba(74, 155, 114, 0.06);
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .today-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .today-badge {
+    background: var(--amber);
+    color: #000;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  .today-title {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  /* CHECKLIST */
+  .checklist {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 6px;
+    border: 1px solid rgba(74, 155, 114, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .checklist li:hover {
+    border-color: var(--green-accent);
+    background: rgba(74, 155, 114, 0.08);
+  }
+
+  .checklist li.done {
+    opacity: 0.5;
+    border-color: transparent;
+  }
+
+  .checklist li.done .check-box {
+    background: var(--green-accent);
+    border-color: var(--green-accent);
+  }
+
+  .checklist li.done .check-box::after {
+    content: '✓';
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  .checklist li.done .step-text {
+    text-decoration: line-through;
+    color: var(--text-muted);
+  }
+
+  .check-box {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 20px;
+    margin-top: 2px;
+  }
+
+  .step-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .step-text strong { color: var(--green-light); }
+  .step-text .tag { 
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(74,155,114,0.15);
+    color: var(--green-accent);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+  }
+
+  /* LINKS GRID */
+  .links-section {
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .link-card {
+    display: block;
+    text-decoration: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 20px 16px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .link-card:hover {
+    border-color: var(--green-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  .link-card::after {
+    content: '→';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--border);
+    transition: all 0.2s;
+  }
+
+  .link-card:hover::after {
+    color: var(--green-accent);
+    right: 12px;
+  }
+
+  .link-card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .link-card-title {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .link-card-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .link-card.primary {
+    background: linear-gradient(135deg, var(--green-mid) 0%, var(--green-dark) 100%);
+    border-color: var(--green-accent);
+  }
+
+  .link-card.primary .link-card-title { color: #fff; }
+  .link-card.primary .link-card-label { color: var(--green-light); }
+  .link-card.primary .link-card-desc { color: var(--green-light); }
+
+  /* PLAYBOOK DOWNLOAD */
+  .playbook-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    animation: fadeUp 0.6s ease 0.35s both;
+  }
+
+  .playbook-icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    background: rgba(74, 155, 114, 0.12);
+    border: 1px solid rgba(74, 155, 114, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+
+  .playbook-info { flex: 1; }
+
+  .playbook-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .playbook-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--green-accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    background: #5aad82;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(74,155,114,0.4);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--green-accent);
+    border: 1px solid var(--green-accent);
+  }
+
+  .btn-outline:hover {
+    background: rgba(74,155,114,0.1);
+  }
+
+  /* VOICE SECTION */
+  .voice-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .voice-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .voice-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(232, 160, 32, 0.12);
+    border: 1px solid rgba(232, 160, 32, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .voice-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .voice-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    background: rgba(232, 160, 32, 0.1);
+    border: 1px solid rgba(232, 160, 32, 0.3);
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+
+  .voice-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+  }
+
+  .voice-instructions {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .voice-instructions strong { color: var(--text); }
+
+  .voice-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .voice-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .voice-step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    min-width: 20px;
+    margin-top: 1px;
+  }
+
+  /* TIPS */
+  .tips {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease 0.45s both;
+  }
+
+  @media (max-width: 600px) {
+    .tips { grid-template-columns: 1fr; }
+    .playbook-section { flex-direction: column; text-align: center; }
+  }
+
+  .tip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .tip-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .tip-icon { font-size: 16px; }
+
+  .tip-title {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .tip p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .tip .highlight {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(74,155,114,0.12);
+    color: var(--green-accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      <span class="logo-text">WILLIS HQ</span>
+    </div>
+    <div class="header-date" id="dateDisplay">Loading...</div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">🏠 Start Here</div>
+    <h1>Welcome to the<br><span>Neighborhood</span>, Willis.</h1>
+    <p class="hero-sub">You are the QA layer. Your job is to test before anything reaches the client. Think of it like working the grill at the world's most high-tech Applebees — no raw code goes to the table. Ever.</p>
+  </div>
+
+  <!-- MISSION -->
+  <div class="mission">
+    <div class="mission-label">Your Mission</div>
+    <p>Use the <strong>EnPro Filtration Mastermind</strong> like a real salesperson would. Type in questions, search for parts, try the voice input, and report back exactly what you see — good or bad. You are <strong>not fixing code</strong>. You are <strong>testing and documenting</strong>. Your findings feed Playwright so the tests run automatically going forward.</p>
+  </div>
+
+  <!-- TODAY'S TASK -->
+  <div class="today">
+    <div class="today-header">
+      <div class="today-badge">Active Now</div>
+      <div class="today-title">EnPro Filtration Mastermind — UAT Testing</div>
+    </div>
+    <ul class="checklist" id="checklist">
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">01</span>
+        <span class="step-text">Download and read the <strong>Testing Playbook</strong> below — 5 min read before you start</span>
+      </li>
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">02</span>
+        <span class="step-text">Open the <strong>EnPro portal</strong> in a new tab <span class="tag">link below</span></span>
+      </li>
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">03</span>
+        <span class="step-text">Run <strong>Smoke Tests S-01 to S-05</strong> first — if any fail, stop and message Peter immediately</span>
+      </li>
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">04</span>
+        <span class="step-text">Work through <strong>Part Number Lookups P-01 to P-08</strong> — these are the core tests</span>
+      </li>
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">05</span>
+        <span class="step-text">Try each test <strong>by typing first</strong>, then try the <strong>same test using voice</strong> if the mic button is visible</span>
+      </li>
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">06</span>
+        <span class="step-text">Log every FAIL and PARTIAL in <strong>Bug Tracking</strong> in this portal <span class="tag">top nav</span></span>
+      </li>
+      <li onclick="toggleItem(this)">
+        <div class="check-box"></div>
+        <span class="step-num">07</span>
+        <span class="step-text">Signal Peter when done or if anything looks seriously wrong</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- LINKS -->
+  <div class="links-section">
+    <div class="section-label">Quick Access</div>
+    <div class="links-grid">
+      <a href="https://enpro-fm-portal.onrender.com" target="_blank" class="link-card primary">
+        <div class="link-card-label">Test Target</div>
+        <div class="link-card-title">EnPro Filtration Mastermind</div>
+        <div class="link-card-desc">The portal you are testing. Open this first.</div>
+      </a>
+      <a href="https://willis-portal.onrender.com" target="_blank" class="link-card">
+        <div class="link-card-label">Log Findings</div>
+        <div class="link-card-title">Willis HQ — Bug Tracking</div>
+        <div class="link-card-desc">Log every FAIL and PARTIAL here with Test ID and notes.</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- PLAYBOOK DOWNLOAD -->
+  <div class="playbook-section">
+    <div class="playbook-icon">📋</div>
+    <div class="playbook-info">
+      <div class="playbook-title">Testing Playbook v1.0</div>
+      <div class="playbook-desc">32 test cases across smoke tests, part lookups, pricing, chemical compatibility, real sales scenarios, and edge cases. Includes voice testing instructions. Read this before you start.</div>
+    </div>
+    <a href="Willis_EnPro_Testing_Playbook.docx" download class="btn btn-primary">⬇ Download Playbook</a>
+  </div>
+
+  <!-- VOICE TESTING -->
+  <div class="voice-section">
+    <div class="voice-header">
+      <div class="voice-icon">🎙️</div>
+      <div>
+        <div class="voice-title">
+          Voice Testing
+          <span class="voice-status"><div class="voice-dot"></div> Check On Portal</span>
+        </div>
+      </div>
+    </div>
+    <div class="voice-instructions">
+      <strong>For every test case in the playbook, run it twice:</strong> once by typing, once by speaking. This tells us whether text and voice produce the same results.
+    </div>
+    <div class="voice-steps">
+      <div class="voice-step">
+        <span class="voice-step-num">01</span>
+        <span>Open the EnPro portal. Look for a microphone button or voice icon in the chat interface.</span>
+      </div>
+      <div class="voice-step">
+        <span class="voice-step-num">02</span>
+        <span>If you see it — click it, speak the test input clearly, and note what comes back. Mark the voice result separately from the typed result.</span>
+      </div>
+      <div class="voice-step">
+        <span class="voice-step-num">03</span>
+        <span>If you don't see a mic button — voice is not yet wired in. Skip voice for now and test text only. Note "Voice: Not Available" in your findings.</span>
+      </div>
+      <div class="voice-step">
+        <span class="voice-step-num">04</span>
+        <span>Speak naturally and at normal speed. Note if the AI misheard anything or if part numbers came through garbled. That's important data.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tip">
+      <div class="tip-head">
+        <span class="tip-icon">🚨</span>
+        <span class="tip-title">When to Stop and Call Peter</span>
+      </div>
+      <p>If Smoke Tests S-01 to S-05 fail, the portal is down, or the AI is making up products that don't exist. Message Peter on Signal immediately.</p>
+    </div>
+    <div class="tip">
+      <div class="tip-head">
+        <span class="tip-icon">📸</span>
+        <span class="tip-title">How to Screenshot</span>
+      </div>
+      <p>Windows: <span class="highlight">Win + Shift + S</span> — drag to select the area. Paste it into your bug report. Always screenshot a FAIL.</p>
+    </div>
+    <div class="tip">
+      <div class="tip-head">
+        <span class="tip-icon">⚠️</span>
+        <span class="tip-title">The Most Critical Tests</span>
+      </div>
+      <p>P-06 and C-03 — the AI must NEVER make up a product or chemical. If it does, that is a BLOCKING failure. Flag it immediately.</p>
+    </div>
+    <div class="tip">
+      <div class="tip-head">
+        <span class="tip-icon">⏱️</span>
+        <span class="tip-title">How Long Will This Take</span>
+      </div>
+      <p>Full test suite: 60–90 minutes. Short version (priority tests only): 30 minutes. You don't have to do it all at once.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    WILLIS HQ &nbsp;·&nbsp; Built by Conveyance Solutions &nbsp;·&nbsp; Powered by Sinton.ia
+  </div>
+
+</div>
+
+<script>
+  // Date display
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+  });
+
+  // Checklist persistence
+  function toggleItem(el) {
+    el.classList.toggle('done');
+    saveChecklist();
+  }
+
+  function saveChecklist() {
+    const items = document.querySelectorAll('#checklist li');
+    const state = Array.from(items).map(i => i.classList.contains('done'));
+    localStorage.setItem('willis_checklist', JSON.stringify(state));
+  }
+
+  function loadChecklist() {
+    const saved = localStorage.getItem('willis_checklist');
+    if (!saved) return;
+    const state = JSON.parse(saved);
+    const items = document.querySelectorAll('#checklist li');
+    items.forEach((item, i) => {
+      if (state[i]) item.classList.add('done');
+    });
+  }
+
+  loadChecklist();
+</script>
+</body>
+</html>

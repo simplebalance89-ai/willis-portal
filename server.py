@@ -213,6 +213,12 @@ async def root():
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
+@app.get("/willis")
+async def willis_homepage():
+    """Willis HQ — QA Testing Dashboard"""
+    return FileResponse(os.path.join(STATIC_DIR, "willis_homepage.html"))
+
+
 @app.get("/api/health")
 @app.get("/health")
 async def health():
@@ -322,6 +328,240 @@ Return your response in this format:
         }
     except Exception as e:
         raise HTTPException(500, str(e))
+
+
+# ── Bug Tracking (EnPro Testing) ─────────────────────────────────────────────
+
+BUGS_FILE = os.path.join(BASE_DIR, "bugs_state.json")
+TEST_RUNS_FILE = os.path.join(BASE_DIR, "test_runs.json")
+
+
+def load_bugs():
+    return _load_json(BUGS_FILE, [])
+
+
+def save_bugs(bugs):
+    _save_json(BUGS_FILE, bugs)
+
+
+def load_test_runs():
+    return _load_json(TEST_RUNS_FILE, [])
+
+
+def save_test_runs(runs):
+    _save_json(TEST_RUNS_FILE, runs)
+
+
+class BugCreate(BaseModel):
+    test_id: str
+    title: str
+    description: str
+    severity: str = "medium"  # critical, high, medium, low
+    status: str = "open"  # open, investigating, fixed, closed
+    enpro_url: str = ""
+    screenshot_path: str = ""
+    notes: str = ""
+
+
+class BugUpdate(BaseModel):
+    status: Optional[str] = None
+    notes: Optional[str] = None
+    severity: Optional[str] = None
+
+
+class TestRunCreate(BaseModel):
+    tester_name: str
+    test_suite: str = "Full Suite"  # Full Suite, Smoke Only, Priority
+    enpro_version: str = ""
+
+
+class TestResultCreate(BaseModel):
+    test_id: str
+    test_name: str
+    result: str  # PASS, FAIL, PARTIAL, BLOCKED, SKIP
+    method: str = "text"  # text, voice
+    notes: str = ""
+    response_time_ms: int = 0
+
+
+@app.get("/api/bugs")
+async def get_bugs(status: str = None, severity: str = None):
+    """Get all bugs, optionally filtered by status or severity."""
+    bugs = load_bugs()
+    if status:
+        bugs = [b for b in bugs if b.get("status") == status]
+    if severity:
+        bugs = [b for b in bugs if b.get("severity") == severity]
+    return {"bugs": bugs, "count": len(bugs)}
+
+
+@app.post("/api/bugs")
+async def create_bug(bug: BugCreate):
+    """Create a new bug report."""
+    bugs = load_bugs()
+    new_bug = {
+        "id": str(uuid.uuid4())[:8],
+        "test_id": bug.test_id,
+        "title": bug.title,
+        "description": bug.description,
+        "severity": bug.severity,
+        "status": bug.status,
+        "enpro_url": bug.enpro_url,
+        "screenshot_path": bug.screenshot_path,
+        "notes": bug.notes,
+        "created": datetime.now().isoformat(),
+        "updated": datetime.now().isoformat(),
+        "reporter": "Willis",  # Could be expanded for multi-user
+    }
+    bugs.append(new_bug)
+    save_bugs(bugs)
+    return new_bug
+
+
+@app.get("/api/bugs/{bug_id}")
+async def get_bug(bug_id: str):
+    """Get a specific bug by ID."""
+    bugs = load_bugs()
+    bug = next((b for b in bugs if b["id"] == bug_id), None)
+    if not bug:
+        raise HTTPException(404, "Bug not found")
+    return bug
+
+
+@app.put("/api/bugs/{bug_id}")
+async def update_bug(bug_id: str, update: BugUpdate):
+    """Update a bug's status, notes, or severity."""
+    bugs = load_bugs()
+    for bug in bugs:
+        if bug["id"] == bug_id:
+            if update.status is not None:
+                bug["status"] = update.status
+            if update.notes is not None:
+                bug["notes"] = update.notes
+            if update.severity is not None:
+                bug["severity"] = update.severity
+            bug["updated"] = datetime.now().isoformat()
+            save_bugs(bugs)
+            return bug
+    raise HTTPException(404, "Bug not found")
+
+
+@app.post("/api/bugs/{bug_id}/notify")
+async def notify_bug_to_peter(bug_id: str):
+    """Send bug notification to Peter via email."""
+    bugs = load_bugs()
+    bug = next((b for b in bugs if b["id"] == bug_id), None)
+    if not bug:
+        raise HTTPException(404, "Bug not found")
+    
+    if not SMTP_PASS:
+        raise HTTPException(500, "SMTP not configured")
+    
+    subject = f"[URGENT] EnPro Bug #{bug['id']}: {bug['title']}"
+    body = f"""EnPro Testing Bug Report
+
+Bug ID: {bug['id']}
+Test ID: {bug['test_id']}
+Severity: {bug['severity'].upper()}
+Status: {bug['status']}
+Reporter: {bug['reporter']}
+Created: {bug['created']}
+
+Title:
+{bug['title']}
+
+Description:
+{bug['description']}
+
+Notes:
+{bug.get('notes', 'None')}
+
+ENPRO URL: {bug.get('enpro_url', 'N/A')}
+"""
+    
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = SMTP_USER
+        msg["To"] = PETER_EMAIL
+        msg["Subject"] = subject
+        msg.attach(MIMEText(body, "plain"))
+        
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASS)
+            server.send_message(msg)
+        
+        # Mark as notified
+        bug["notified"] = datetime.now().isoformat()
+        save_bugs(bugs)
+        
+        return {"status": "sent", "to": PETER_EMAIL, "bug_id": bug_id}
+    except Exception as e:
+        raise HTTPException(500, f"Email failed: {str(e)}")
+
+
+# ── Test Runs ────────────────────────────────────────────────────────────────
+
+@app.get("/api/test-runs")
+async def get_test_runs():
+    """Get all test runs."""
+    return {"runs": load_test_runs()}
+
+
+@app.post("/api/test-runs")
+async def create_test_run(run: TestRunCreate):
+    """Start a new test run session."""
+    runs = load_test_runs()
+    new_run = {
+        "id": str(uuid.uuid4())[:8],
+        "tester_name": run.tester_name,
+        "test_suite": run.test_suite,
+        "enpro_version": run.enpro_version,
+        "started": datetime.now().isoformat(),
+        "ended": None,
+        "results": [],
+        "summary": {"pass": 0, "fail": 0, "partial": 0, "blocked": 0, "skip": 0},
+    }
+    runs.append(new_run)
+    save_test_runs(runs)
+    return new_run
+
+
+@app.post("/api/test-runs/{run_id}/results")
+async def add_test_result(run_id: str, result: TestResultCreate):
+    """Add a test result to a run."""
+    runs = load_test_runs()
+    for run in runs:
+        if run["id"] == run_id:
+            result_entry = {
+                "test_id": result.test_id,
+                "test_name": result.test_name,
+                "result": result.result,
+                "method": result.method,
+                "notes": result.notes,
+                "response_time_ms": result.response_time_ms,
+                "timestamp": datetime.now().isoformat(),
+            }
+            run["results"].append(result_entry)
+            # Update summary counts
+            result_key = result.result.lower()
+            if result_key in run["summary"]:
+                run["summary"][result_key] += 1
+            save_test_runs(runs)
+            return result_entry
+    raise HTTPException(404, "Test run not found")
+
+
+@app.post("/api/test-runs/{run_id}/finish")
+async def finish_test_run(run_id: str):
+    """Mark a test run as finished."""
+    runs = load_test_runs()
+    for run in runs:
+        if run["id"] == run_id:
+            run["ended"] = datetime.now().isoformat()
+            save_test_runs(runs)
+            return run
+    raise HTTPException(404, "Test run not found")
 
 
 # ── Cases (NetSuite Case Center) ─────────────────────────────────────────────

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bug Tracking — Willis HQ</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #1A3D2E;
+    --green-mid: #2E5F4A;
+    --green-accent: #4A9B72;
+    --green-light: #A8D5BE;
+    --amber: #E8A020;
+    --amber-light: #FFF0CC;
+    --red: #C0392B;
+    --red-light: #F5B7B1;
+    --bg: #0D1F17;
+    --surface: #142B1F;
+    --surface2: #1C3828;
+    --border: #2A5040;
+    --text: #E8F5EE;
+    --text-muted: #7AB090;
+    --mono: 'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--green-accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--green-accent);
+  }
+
+  .logo-text {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 16px;
+  }
+
+  .nav-link {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    color: var(--green-accent);
+    background: rgba(74, 155, 114, 0.1);
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--green-accent);
+  }
+
+  .stat-value.critical { color: var(--red); }
+  .stat-value.high { color: var(--amber); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  /* SECTIONS */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--green-accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #5aad82; }
+
+  .btn-danger {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 10px;
+  }
+
+  /* FILTERS */
+  .filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filter-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 13px;
+  }
+
+  /* BUG LIST */
+  .bug-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bug-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s;
+  }
+
+  .bug-item:hover {
+    border-color: var(--green-mid);
+  }
+
+  .bug-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .bug-id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green-accent);
+    background: rgba(74, 155, 114, 0.1);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .bug-severity {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+
+  .bug-severity.critical {
+    background: rgba(192, 57, 43, 0.2);
+    color: var(--red);
+    border: 1px solid var(--red);
+  }
+
+  .bug-severity.high {
+    background: rgba(232, 160, 32, 0.2);
+    color: var(--amber);
+    border: 1px solid var(--amber);
+  }
+
+  .bug-severity.medium {
+    background: rgba(74, 155, 114, 0.2);
+    color: var(--green-accent);
+    border: 1px solid var(--green-accent);
+  }
+
+  .bug-severity.low {
+    background: rgba(122, 176, 144, 0.2);
+    color: var(--text-muted);
+    border: 1px solid var(--text-muted);
+  }
+
+  .bug-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .bug-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .bug-description {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .bug-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* FORM */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 14px;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--green-accent);
+  }
+
+  .form-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .modal-body {
+    padding: 24px;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+  }
+
+  .empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  /* LOADING */
+  .loading {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-muted);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--green-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      <span class="logo-text">BUG TRACKING</span>
+    </div>
+    <nav class="nav-links">
+      <a href="/" class="nav-link">Portal</a>
+      <a href="/willis" class="nav-link">Willis HQ</a>
+      <a href="/static/bug-tracking.html" class="nav-link active">Bugs</a>
+      <a href="https://enpro-fm-portal.onrender.com" target="_blank" class="nav-link">EnPro →</a>
+    </nav>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total">-</div>
+      <div class="stat-label">Total Bugs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value critical" id="stat-critical">-</div>
+      <div class="stat-label">Critical</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value high" id="stat-high">-</div>
+      <div class="stat-label">High</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-open">-</div>
+      <div class="stat-label">Open</div>
+    </div>
+  </div>
+
+  <!-- BUGS LIST -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Bug Reports</h2>
+      <button class="btn btn-primary" onclick="openModal()">+ New Bug</button>
+    </div>
+
+    <div class="filters">
+      <select class="filter-select" id="filter-status" onchange="loadBugs()">
+        <option value="">All Status</option>
+        <option value="open">Open</option>
+        <option value="investigating">Investigating</option>
+        <option value="fixed">Fixed</option>
+        <option value="closed">Closed</option>
+      </select>
+      <select class="filter-select" id="filter-severity" onchange="loadBugs()">
+        <option value="">All Severity</option>
+        <option value="critical">Critical</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+    </div>
+
+    <div class="bug-list" id="bug-list">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading bugs...</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NEW BUG MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Report New Bug</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="bug-form" onsubmit="submitBug(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Test ID</label>
+            <input type="text" class="form-input" id="bug-test-id" placeholder="e.g., P-06, S-03" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Severity</label>
+            <select class="form-select" id="bug-severity">
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-input" id="bug-title" placeholder="Short description of the bug" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" id="bug-description" placeholder="Detailed description of what happened, what you expected, and what actually happened..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">ENPRO URL (optional)</label>
+            <input type="text" class="form-input" id="bug-url" placeholder="https://enpro-fm-portal.onrender.com/...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Screenshot Path (optional)</label>
+            <input type="text" class="form-input" id="bug-screenshot" placeholder="Path to screenshot file">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="bug-notes" placeholder="Additional notes, reproduction steps, etc."></textarea>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+          <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Report Bug</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Load bugs on page load
+  loadBugs();
+
+  async function loadBugs() {
+    const status = document.getElementById('filter-status').value;
+    const severity = document.getElementById('filter-severity').value;
+    
+    let url = '/api/bugs';
+    const params = [];
+    if (status) params.push(`status=${status}`);
+    if (severity) params.push(`severity=${severity}`);
+    if (params.length) url += '?' + params.join('&');
+    
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      renderBugs(data.bugs);
+      updateStats(data.bugs);
+    } catch (err) {
+      document.getElementById('bug-list').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚠️</div>
+          <p>Error loading bugs: ${err.message}</p>
+        </div>
+      `;
+    }
+  }
+
+  function renderBugs(bugs) {
+    const container = document.getElementById('bug-list');
+    
+    if (!bugs || bugs.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🎉</div>
+          <p>No bugs found! Either filters are too strict or EnPro is perfect.</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Sort by created date, newest first
+    bugs.sort((a, b) => new Date(b.created) - new Date(a.created));
+    
+    container.innerHTML = bugs.map(bug => `
+      <div class="bug-item">
+        <div class="bug-header">
+          <span class="bug-id">#${bug.id}</span>
+          <span class="bug-severity ${bug.severity}">${bug.severity}</span>
+        </div>
+        <div class="bug-title">${escapeHtml(bug.title)}</div>
+        <div class="bug-meta">
+          Test: ${bug.test_id} • Status: ${bug.status} • ${formatDate(bug.created)}
+        </div>
+        <div class="bug-description">${escapeHtml(bug.description)}</div>
+        <div class="bug-actions">
+          ${bug.status !== 'closed' ? `
+            <button class="btn btn-sm" onclick="updateStatus('${bug.id}', 'investigating')">Investigate</button>
+            <button class="btn btn-sm" onclick="updateStatus('${bug.id}', 'fixed')">Mark Fixed</button>
+          ` : ''}
+          <button class="btn btn-sm btn-danger" onclick="notifyPeter('${bug.id}')">Notify Peter</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateStats(bugs) {
+    const total = bugs.length;
+    const critical = bugs.filter(b => b.severity === 'critical').length;
+    const high = bugs.filter(b => b.severity === 'high').length;
+    const open = bugs.filter(b => b.status === 'open').length;
+    
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-critical').textContent = critical;
+    document.getElementById('stat-high').textContent = high;
+    document.getElementById('stat-open').textContent = open;
+  }
+
+  function openModal() {
+    document.getElementById('modal').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('active');
+    document.getElementById('bug-form').reset();
+  }
+
+  async function submitBug(e) {
+    e.preventDefault();
+    
+    const bug = {
+      test_id: document.getElementById('bug-test-id').value,
+      title: document.getElementById('bug-title').value,
+      description: document.getElementById('bug-description').value,
+      severity: document.getElementById('bug-severity').value,
+      enpro_url: document.getElementById('bug-url').value,
+      screenshot_path: document.getElementById('bug-screenshot').value,
+      notes: document.getElementById('bug-notes').value,
+    };
+    
+    try {
+      const res = await fetch('/api/bugs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bug),
+      });
+      
+      if (res.ok) {
+        closeModal();
+        loadBugs();
+      } else {
+        const err = await res.json();
+        alert('Error: ' + (err.detail || 'Failed to create bug'));
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function updateStatus(bugId, status) {
+    try {
+      const res = await fetch(`/api/bugs/${bugId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      
+      if (res.ok) {
+        loadBugs();
+      } else {
+        alert('Failed to update status');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function notifyPeter(bugId) {
+    if (!confirm('Send bug notification to Peter via email?')) return;
+    
+    try {
+      const res = await fetch(`/api/bugs/${bugId}/notify`, {
+        method: 'POST',
+      });
+      
+      if (res.ok) {
+        alert('Notification sent to Peter!');
+      } else {
+        const err = await res.json();
+        alert('Error: ' + (err.detail || 'Failed to send notification'));
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function formatDate(iso) {
+    if (!iso) return 'Unknown';
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Close modal on overlay click
+  document.getElementById('modal').addEventListener('click', (e) => {
+    if (e.target.id === 'modal') closeModal();
+  });
+</script>
+
+</body>
+</html>

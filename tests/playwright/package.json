@@ -1,0 +1,14 @@
+{
+  "name": "enpro-playwright-tests",
+  "version": "1.0.0",
+  "description": "Automated testing for EnPro Filtration Mastermind",
+  "scripts": {
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep '@smoke'",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.0"
+  }
+}
